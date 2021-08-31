@@ -21,15 +21,15 @@ pair_inspection <- function(id, data_sheet){
                                               choices = unique(data_sheet$data$Breeding_pair))
                                               })
         output$BreedingPairGraph <- renderPlot({
-          plot_data <- data_sheet$data
+          pair_data <- data_sheet$data
            
-          if (!is.null(plot_data)) {
-            plot_data <-
-              plot_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
-            plot_data <- plot_data %>% 
-              dplyr::filter(Breeding_pair == input$BreedingPair)
+          if (!is.null(pair_data)) {
+            pair_data <-
+              pair_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
+            pair_data <- pair_data %>% 
+              dplyr::filter(Breeding_pair %in% input$BreedingPair)
             Breeding_chart <-
-              ggplot2::ggplot(plot_data,
+              ggplot2::ggplot(pair_data,
                               aes(x = Litter_date, 
                                   y = Litter_size, 
                                   color = Breeding_pair)) + 
