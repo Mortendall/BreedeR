@@ -11,6 +11,7 @@ data_loading_ui <- function(id){
                 buttonLabel = "Enter a database file",
                 multiple = F,
                 accept = c(".xlsx")),
+      shiny::checkboxInput(inputId = ns("HetButton"), label = "Add heterozygotes to template?", value = F),
       shiny::downloadButton(outputId = ns("TemplateDownload"),
                             label = "Download Template Sheet")
     ),
@@ -26,6 +27,7 @@ data_loading <- function(id, data_sheet){
     id,
     
     function(input, output, session){
+      
       output$Dataoverview <- renderDataTable({
        file <- input$Database 
         ext <- tools::file_ext(file$datapath)
@@ -61,8 +63,14 @@ data_loading <- function(id, data_sheet){
           "templatesheet.xlsx"
         },
         content = function(file){
-          templateSheet <- data.frame(matrix(ncol = 7, nrow = 1))  
-            colnames(templateSheet)<-c("Breeding_pair", "Setup_date", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups")
+          if (isTRUE(input$HetButton)){
+            templateSheet <- data.frame(matrix(ncol = 7, nrow = 1))  
+            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "Het_pups")
+          }
+          else {
+            templateSheet <- data.frame(matrix(ncol = 6, nrow = 1))  
+            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups")
+          }
           openxlsx::write.xlsx(templateSheet, file = file)
         }
       )
