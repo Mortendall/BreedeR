@@ -1,15 +1,19 @@
+library(shiny)
+library(tidyverse)
+library(here)
+library(openxlsx)
 
 pair_management_ui <- function(id){
   ns <- shiny::NS(id)
   fluidPage(
     shiny::fluidRow(shiny::column(3,
-      shiny::uiOutput(ns("BreedingPairSelector")),
       shiny::textInput(ns("Filename"), label = "Database Name", value = "MyDatabase"),
       shiny::downloadButton(outputId = ns("DatabaseDownload"),
                             label = "Download Database Sheet")
     ),
       shiny::column(3,
       shiny::h3("Add Litter"),
+      shiny::uiOutput(ns("BreedingPairSelector")),
       shiny::dateInput(ns("LitterDate"),label = "Litter Birth Date",  width = "50%"),
       shiny::textInput(ns("Males"),label = "No. of males", value = 0, width = "20%"),
       shiny::textInput(ns("Females"),label = "No. of females", value = 0, width = "20%"),
@@ -17,10 +21,15 @@ pair_management_ui <- function(id){
       shiny::textInput(ns("Knockouts"),label = "No of Knockouts", value = 0, width = "20%"),
       shiny::checkboxInput(ns("HetBox"), label = "Allow heterozygotes?", value = F),
       shiny::uiOutput(outputId = ns("HetPups")),
-      shiny::actionButton(ns("Submit"), label = "Add Breeding Pair")
-      
-      #consider adding check box for enabling heterozygotes?
-      ))
+      shiny::actionButton(ns("Submit"), label = "Add Litter")
+      ),
+    shiny::column(3,
+                  shiny::h3("Add Breeding Pair"),
+                  shiny::textInput(ns("PairID"),label = "Breeding Pair ID", value = 0, width = "50%"),
+                  shiny::dateInput(ns("SetupDate"), label = "Add Setup date for new pair", width = "50%"),
+                  shiny::actionButton(ns("SubmitBP"), label = "Add Breeding Pair")
+                  )
+    )
     )
 }
 
@@ -61,12 +70,11 @@ pair_management <- function(id, data_sheet){
                                          "KO_pups"= as.integer(input$Knockouts),
                                          "Het_pups"=as.integer(input$Heterozygotes))
          }
-      #   add a series of quality control steps to ensure there's an input. Add the row to 
          
          if (length(new_litter$data) != length(data_sheet$data)){
            shinyWidgets::sendSweetAlert(session,
                                         title = "Warning",
-                                        type = "Error",
+                                        type = "error",
                                         text = "Your database has a different column length from your input. Did you forget to allow/remove heterozygotes?")
          }
          else{
@@ -82,9 +90,55 @@ pair_management <- function(id, data_sheet){
            openxlsx::write.xlsx(database, file = file)
          }
        )
-       
-      #data loading
-      #Graph
-      #Table
+       shiny::observeEvent(input$SubmitBP,{
+         if(is.null(data_sheet$data)){
+           if (isTRUE(input$HetButton)){
+             data_sheet$data<- data.frame("Breeding_pair"= input$PairID,
+                                      "Litter_date" = input$SetupDate,
+                                      "Male_pups"=0,
+                                      "Female_pups"=0,
+                                      "WT_pups"=0,
+                                      "KO_pups"=0,
+                                      "Het_pups"=0)
+           }
+           else {
+             data_sheet$data <- data.frame("Breeding_pair"= input$PairID,
+                                      "Litter_date" = input$SetupDate,
+                                      "Male_pups"=0,
+                                      "Female_pups"=0,
+                                      "WT_pups"=0,
+                                      "KO_pups"=0)
+             }}
+           else{
+           if (isTRUE(input$HetButton)){
+           SetupSheet <- data.frame("Breeding_pair"= input$PairID,
+                                      "Litter_date" = input$SetupDate,
+                                      "Male_pups"=0,
+                                      "Female_pups"=0,
+                                      "WT_pups"=0,
+                                      "KO_pups"=0,
+                                      "Het_pups"=0)
+         }
+         else {
+           SetupSheet <- data.frame("Breeding_pair"= input$PairID,
+                                      "Litter_date" = input$SetupDate,
+                                      "Male_pups"=0,
+                                      "Female_pups"=0,
+                                      "WT_pups"=0,
+                                      "KO_pups"=0)
+           
+         }
+         if (length(SetupSheet) != length(data_sheet$data)){
+           shinyWidgets::sendSweetAlert(session,
+                                        title = "Warning",
+                                        type = "error",
+                                        text = "Your database has a different column length from your input. Did you forget to allow/remove heterozygotes?")
+         }
+         else{
+           data_sheet$data <- dplyr::bind_rows(data_sheet$data, SetupSheet)
+         }
+         }
+       })
+
     })
 }
