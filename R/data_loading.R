@@ -2,6 +2,10 @@ library(shiny)
 library(tidyverse)
 library(here)
 library(openxlsx)
+library(shinyTime)
+
+#tilføj next expected litter
+#kaplna-meyer for POMC + pup + youngster track
 data_loading_ui <- function(id){
   ns <- shiny::NS(id)
   sidebarLayout(

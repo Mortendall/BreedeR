@@ -31,7 +31,7 @@ summary_stats <- function(id, data_sheet, summary_sheet){
       })
       output$summary_table_geno <- shiny::renderTable({
         req(data_sheet$data)
-        if(length(data_sheet$data)==6){
+        if(length(data_sheet$data)==7){
         summary_sheet$total_geno <- data_sheet$data %>% 
           dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
           rstatix::get_summary_stats(c(WT_pups, KO_pups), type = "mean") %>%
