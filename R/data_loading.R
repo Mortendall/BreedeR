@@ -1,8 +1,9 @@
-library(shiny)
-library(tidyverse)
-library(here)
-library(openxlsx)
-library(shinyTime)
+# library(shiny)
+# library(magrittr)
+# library(dplyr)
+# library(here)
+# library(openxlsx)
+# library(shinyTime)
 
 #tilføj next expected litter
 #kaplna-meyer for POMC + pup + youngster track
@@ -53,7 +54,7 @@ data_loading <- function(id, data_sheet){
         
         for (i in 1:length(data_displayed)){
           if (endsWith(colnames(data_displayed)[i], "_date"))
-            data_displayed[,i] <- convertToDate(data_displayed[,i])
+            data_displayed[,i] <- openxlsx::convertToDate(data_displayed[,i])
         }
         data_sheet$data <- data_displayed
         })
@@ -68,14 +69,14 @@ data_loading <- function(id, data_sheet){
         req(input$YearSlider)
         plot_data <- data_sheet$data
           plot_data <-
-            plot_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
+            plot_data |> dplyr::mutate(Litter_size = Male_pups + Female_pups)
           Breeding_chart <-
             ggplot2::ggplot(plot_data,
-                            aes(x = Litter_date, 
+                            ggplot2::aes(x = Litter_date, 
                                 y = Litter_size, 
                                 color = Breeding_pair)) + 
-            geom_line() +
-            geom_point(size = 8)+ 
+            ggplot2::geom_line() +
+            ggplot2::geom_point(size = 8)+ 
             ggplot2::coord_cartesian(xlim = c(input$YearSlider[1], input$YearSlider[2]))
             
           data_sheet$graph <- Breeding_chart
@@ -116,7 +117,7 @@ data_loading <- function(id, data_sheet){
         req(data_sheet$data)
         pair_data <- data_sheet$data
           pair_data <-
-            pair_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
+            pair_data |> dplyr::mutate(Litter_size = Male_pups + Female_pups)
                 
         res <- nearPoints(pair_data, input$netHover, xvar = "Litter_date", yvar = "Litter_size", maxpoints = 1)
         if (nrow(res)>0) {

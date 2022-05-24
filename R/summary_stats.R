@@ -23,26 +23,26 @@ summary_stats <- function(id, data_sheet, summary_sheet){
     function(input, output, session){
       output$summary_table_sex <- shiny::renderTable({
         req(data_sheet$data)
-      summary_sheet$total_sex <- data_sheet$data %>% 
-        dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
-        rstatix::get_summary_stats(c(Male_pups, Female_pups), type = "mean") %>% 
-        dplyr::mutate(n = as.integer(n)) %>% 
+      summary_sheet$total_sex <- data_sheet$data  |>  
+        dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) |> 
+        rstatix::get_summary_stats(c(Male_pups, Female_pups), type = "mean") |> 
+        dplyr::mutate(n = as.integer(n)) |> 
         dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean)
       })
       output$summary_table_geno <- shiny::renderTable({
         req(data_sheet$data)
         if(length(data_sheet$data)==7){
-        summary_sheet$total_geno <- data_sheet$data %>% 
-          dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
-          rstatix::get_summary_stats(c(WT_pups, KO_pups), type = "mean") %>%
-          dplyr::mutate(n = as.integer(n)) %>% 
+        summary_sheet$total_geno <- data_sheet$data |> 
+          dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) |> 
+          rstatix::get_summary_stats(c(WT_pups, KO_pups), type = "mean") |>
+          dplyr::mutate(n = as.integer(n)) |> 
           dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean) 
         }
         else{
-          summary_sheet$total_geno <- data_sheet$data %>% 
-            dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
-            rstatix::get_summary_stats(c(WT_pups, KO_pups, Het_pups), type = "mean") %>% 
-            dplyr::mutate(n = as.integer(n)) %>% 
+          summary_sheet$total_geno <- data_sheet$data |> 
+            dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) |> 
+            rstatix::get_summary_stats(c(WT_pups, KO_pups, Het_pups), type = "mean") |> 
+            dplyr::mutate(n = as.integer(n)) |> 
             dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean) 
         }
         })
@@ -51,9 +51,9 @@ summary_stats <- function(id, data_sheet, summary_sheet){
          breedingPairs <- unique(data_sheet$data$Breeding_pair)
          dateResults <- data.frame()
          for (i in 1:length(breedingPairs)){
-           calculate_time <- data_sheet$data %>% 
-             dplyr::filter(Breeding_pair==breedingPairs[i]) %>% 
-             dplyr::select(Breeding_pair, Litter_date) %>%
+           calculate_time <- data_sheet$data |> 
+             dplyr::filter(Breeding_pair==breedingPairs[i]) |> 
+             dplyr::select(Breeding_pair, Litter_date) |>
              dplyr::arrange(Litter_date) 
            pairresult <- data.frame(days = NA)
            for (j in 1:(length(calculate_time$Litter_date))-1){
@@ -63,7 +63,7 @@ summary_stats <- function(id, data_sheet, summary_sheet){
          }
          dateResults <- stats::na.omit(dateResults)
          BetweenLitters <- mean(dateResults$days)
-         summary_sheet$AvrTime <- as.data.frame(BetweenLitters) %>% 
+         summary_sheet$AvrTime <- as.data.frame(BetweenLitters) |> 
            dplyr::rename("Avr days between litters" = BetweenLitters)
       })
       shiny::observeEvent(input$Submit,{
@@ -83,13 +83,13 @@ summary_stats <- function(id, data_sheet, summary_sheet){
                                          type = "warning",
                                          text = "You will not be able to generate sufficient litters in such a short time frame. Increase the starting date.")
           }
-           if(TimeDif<input$AgeRange[1]*7){
+           if(TimeDif<input$AgeRange[1]*7+20){
              shinyWidgets::sendSweetAlert(session,
                                           title = "Warning",
                                           type = "warning",
                                           text = "You cannot generate mice of the desired age range in this time frame. Increase the minimum range of the age slider")
            }
-          else{SetupDate <- input$StartDate - input$AgeRange[1]*7
+          else{SetupDate <- input$StartDate - 20 - input$AgeRange[1]*7
           InterestGroup <- switch(
             input$Genotype,
             "WT" = "WT_pups",
@@ -99,10 +99,10 @@ summary_stats <- function(id, data_sheet, summary_sheet){
             "Female" = "Female_pups"
           ) 
           if(InterestGroup=="Male_pups"|InterestGroup=="Female_pups"){
-            AnimalsPrLitter <- subset(summary_sheet$total_sex, ID == InterestGroup) %>% dplyr::select('Avr. pr. litter')
+            AnimalsPrLitter <- subset(summary_sheet$total_sex, ID == InterestGroup) |> dplyr::select('Avr. pr. litter')
           }
           else{
-            AnimalsPrLitter <- subset(summary_sheet$total_geno, ID == InterestGroup) %>% dplyr::select('Avr. pr. litter')
+            AnimalsPrLitter <- subset(summary_sheet$total_geno, ID == InterestGroup) |> dplyr::select('Avr. pr. litter')
           }
           
           LitterNum <- round((as.integer(input$AnimalNum)/AnimalsPrLitter),0)

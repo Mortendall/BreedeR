@@ -24,9 +24,9 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
         LoadedData <- read.table(text = input$dataEntry, sep = "\t")
         colnames(LoadedData) <- c("Sex", "Genotype", "Birthdate", "BreedingPair")
         if(isFALSE(input$HetBox)){
-          test_sheet_geno <- LoadedData %>% 
-          dplyr::group_by(Genotype, Birthdate, BreedingPair) %>% 
-          dplyr::tally() %>% 
+          test_sheet_geno <- LoadedData |> 
+          dplyr::group_by(Genotype, Birthdate, BreedingPair) |> 
+          dplyr::tally() |> 
           tidyr::pivot_wider(names_from = Genotype, values_from = n) 
           
           if (!"WT" %in% colnames(test_sheet_geno)){
@@ -42,13 +42,13 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
               dplyr::mutate("N/A"=0)
           }
           test_sheet_geno <- test_sheet_geno |> 
-          dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) %>% 
-          tidyr::replace_na(list(WT = 0, KO = 0, "N/A"=0)) %>% 
+          dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) |> 
+          tidyr::replace_na(list(WT = 0, KO = 0, "N/A"=0)) |> 
           dplyr::select(Birthdate, BreedingPair, WT, KO, "N/A", ID)
         
-        test_sheet_sex <- LoadedData %>% 
-          dplyr::group_by(Sex, Birthdate, BreedingPair) %>% 
-          dplyr::tally() %>% 
+        test_sheet_sex <- LoadedData |> 
+          dplyr::group_by(Sex, Birthdate, BreedingPair) |> 
+          dplyr::tally() |> 
           tidyr::pivot_wider(names_from = Sex, values_from = n)
         
         if (!"F" %in% colnames(test_sheet_sex)){
@@ -60,35 +60,35 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
             dplyr::mutate("M"=0)
         }
         test_sheet_sex <- test_sheet_sex |> 
-          dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) %>% 
+          dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) |> 
           tidyr::replace_na(list("F"=0, M = 0))
         
         test_sheet_joined <-
           left_join(test_sheet_geno,
                     test_sheet_sex,
                     by = "ID",
-                    suffix = c("", ".y")) %>% 
-          dplyr::select_at(dplyr::vars(-ends_with(".y"))) %>%  
-          dplyr::select(-ID) %>% 
+                    suffix = c("", ".y")) |> 
+          dplyr::select_at(dplyr::vars(-ends_with(".y"))) |>  
+          dplyr::select(-ID) |> 
           dplyr::rename(Breeding_pair = "BreedingPair",
                         Litter_date = "Birthdate",
                         Male_pups = "M",
                         Female_pups = "F",
                         WT_pups = "WT",
                         KO_pups = "KO",
-                        NA_pups = "N/A") %>% 
+                        NA_pups = "N/A") |> 
           dplyr::mutate(Litter_date = as.Date(Litter_date, format = "%m/%d/%Y"),
                         Male_pups = as.integer(Male_pups),
                         Female_pups = as.integer(Female_pups),
                         WT_pups = as.integer(WT_pups),
                         KO_pups = as.integer(KO_pups),
-                        NA_pups = as.integer(NA_pups)) %>% 
+                        NA_pups = as.integer(NA_pups)) |> 
           dplyr::select("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "NA_pups")
         }
         else{
-          test_sheet_geno <- LoadedData %>% 
-            dplyr::group_by(Genotype, Birthdate, BreedingPair) %>% 
-            dplyr::tally() %>% 
+          test_sheet_geno <- LoadedData |> 
+            dplyr::group_by(Genotype, Birthdate, BreedingPair) |> 
+            dplyr::tally() |> 
             tidyr::pivot_wider(names_from = Genotype, values_from = n)
           if (!"WT" %in% colnames(test_sheet_geno)){
             test_sheet_geno <- test_sheet_geno |> 
@@ -107,13 +107,13 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
               dplyr::mutate("Het"=0)
           }
           test_sheet_geno <- test_sheet_geno |> 
-            dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) %>% 
-            tidyr::replace_na(list(WT = 0, KO = 0, Het = 0, "N/A"=0)) %>% 
+            dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) |> 
+            tidyr::replace_na(list(WT = 0, KO = 0, Het = 0, "N/A"=0)) |> 
             dplyr::select(Birthdate, BreedingPair, WT, KO, Het, "N/A", ID)
           
-          test_sheet_sex <- LoadedData %>% 
-            dplyr::group_by(Sex, Birthdate, BreedingPair) %>% 
-            dplyr::tally() %>% 
+          test_sheet_sex <- LoadedData |> 
+            dplyr::group_by(Sex, Birthdate, BreedingPair) |> 
+            dplyr::tally() |> 
             tidyr::pivot_wider(names_from = Sex, values_from = n)
           
           if (!"F" %in% colnames(test_sheet_sex)){
@@ -125,16 +125,16 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
               dplyr::mutate("M"=0)
           }
           test_sheet_sex <- test_sheet_sex |> 
-            dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) %>% 
+            dplyr::mutate(ID = paste(Birthdate,BreedingPair, sep = "_")) |> 
             tidyr::replace_na(list("F"=0, M = 0))
           
           test_sheet_joined <-
             left_join(test_sheet_geno,
                       test_sheet_sex,
                       by = "ID",
-                      suffix = c("", ".y")) %>% 
-            dplyr::select_at(dplyr::vars(-ends_with(".y"))) %>%  
-            dplyr::select(-ID) %>% 
+                      suffix = c("", ".y")) |> 
+            dplyr::select_at(dplyr::vars(-ends_with(".y"))) |>  
+            dplyr::select(-ID) |> 
             dplyr::rename(Breeding_pair = "BreedingPair",
                           Litter_date = "Birthdate",
                           Male_pups = "M",
@@ -142,13 +142,13 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
                           WT_pups = "WT",
                           KO_pups = "KO",
                           Het_pups = "Het", 
-                          NA_pups = "N/A") %>% 
+                          NA_pups = "N/A") |> 
             dplyr::mutate(Male_pups = as.integer(Male_pups),
                           Female_pups = as.integer(Female_pups),
                           WT_pups = as.integer(WT_pups),
                           KO_pups = as.integer(KO_pups),
                           Het_pups = as.integer(Het_pups),
-                          NA_pups = as.integer(NA_pups)) %>% 
+                          NA_pups = as.integer(NA_pups)) |> 
             dplyr::select("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "Het_pups") 
         }
         data_sheet$lazy <- test_sheet_joined

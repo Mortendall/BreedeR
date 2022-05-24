@@ -28,45 +28,45 @@ pair_inspection <- function(id, data_sheet, summary_sheet){
           req(data_sheet$data)
           pair_data <- data_sheet$data
              pair_data <-
-              pair_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
-            pair_data <- pair_data %>% 
+              pair_data |> dplyr::mutate(Litter_size = Male_pups + Female_pups)
+            pair_data <- pair_data |> 
               dplyr::filter(Breeding_pair %in% input$BreedingPair)
             Breeding_chart <-
               ggplot2::ggplot(pair_data,
-                              aes(x = Litter_date, 
+                              ggplot2::aes(x = Litter_date, 
                                   y = Litter_size, 
                                   color = Breeding_pair)) + 
-              geom_line() +
-              geom_point(size = 8)
+              ggplot2::geom_line() +
+              ggplot2::geom_point(size = 8)
             Breeding_chart
           }
           
         )
         output$BreedingStats_sex <- shiny::renderTable({
           req(data_sheet$data)
-          summary_sheet$pairs <- data_sheet$data %>% 
-            dplyr::filter(Male_pups+Female_pups!=0) %>% 
-            dplyr::filter(Breeding_pair %in% input$BreedingPair)%>% 
-            rstatix::get_summary_stats(c(Male_pups, Female_pups), type = "mean") %>% 
-            dplyr::mutate(n = as.integer(n)) %>% 
+          summary_sheet$pairs <- data_sheet$data |> 
+            dplyr::filter(Male_pups+Female_pups!=0) |> 
+            dplyr::filter(Breeding_pair %in% input$BreedingPair)|> 
+            rstatix::get_summary_stats(c(Male_pups, Female_pups), type = "mean") |> 
+            dplyr::mutate(n = as.integer(n)) |> 
             dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean) 
           })
         output$BreedingStats_geno <- shiny::renderTable({
           req(data_sheet$data)
           if(length(data_sheet$data ==6)){
-            summary_sheet$total <- data_sheet$data %>% 
-            dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
-            dplyr::filter(Breeding_pair %in% input$BreedingPair)%>%
-            rstatix::get_summary_stats(c(WT_pups, KO_pups), type = "mean") %>% 
-              dplyr::mutate(n = as.integer(n)) %>% 
+            summary_sheet$total <- data_sheet$data |> 
+            dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) |> 
+            dplyr::filter(Breeding_pair %in% input$BreedingPair)|>
+            rstatix::get_summary_stats(c(WT_pups, KO_pups), type = "mean") |> 
+              dplyr::mutate(n = as.integer(n)) |> 
             dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean) 
           }
           else{
-            summary_sheet$total <- data_sheet$data %>% 
-              dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) %>% 
-              dplyr::filter(Breeding_pair %in% input$BreedingPair)%>%
-              rstatix::get_summary_stats(c(WT_pups, KO_pups, Het_pups), type = "mean") %>% 
-              dplyr::mutate(n = as.integer(n)) %>% 
+            summary_sheet$total <- data_sheet$data |> 
+              dplyr::filter(Male_pups+Female_pups+WT_pups+KO_pups!=0) |> 
+              dplyr::filter(Breeding_pair %in% input$BreedingPair)|>
+              rstatix::get_summary_stats(c(WT_pups, KO_pups, Het_pups), type = "mean") |> 
+              dplyr::mutate(n = as.integer(n)) |> 
               dplyr::rename("ID" = variable, "Number of Litters" = n, "Avr. pr. litter" = mean) 
           }
         })
@@ -75,8 +75,8 @@ pair_inspection <- function(id, data_sheet, summary_sheet){
           req(data_sheet$data)
           pair_data <- data_sheet$data
             pair_data <-
-              pair_data %>% dplyr::mutate(Litter_size = Male_pups + Female_pups)
-            pair_data <- pair_data %>% 
+              pair_data |> dplyr::mutate(Litter_size = Male_pups + Female_pups)
+            pair_data <- pair_data |> 
               dplyr::filter(Breeding_pair %in% input$BreedingPair)
           
           res <- nearPoints(pair_data, input$netHover, xvar = "Litter_date", yvar = "Litter_size", maxpoints = 1)
