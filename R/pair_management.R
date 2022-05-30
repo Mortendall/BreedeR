@@ -18,6 +18,7 @@ pair_management_ui <- function(id){
       shiny::textInput(ns("Females"),label = "No. of females", value = 0, width = "20%"),
       shiny::textInput(ns("Wildtype"),label = "No. of Wildtypes", value = 0, width = "20%"),
       shiny::textInput(ns("Knockouts"),label = "No of Knockouts", value = 0, width = "20%"),
+      shiny::textInput(ns("NApups"), label = "No. of unknowns", value = 0, width = "20%"),
       shiny::checkboxInput(ns("HetBox"), label = "Allow heterozygotes?", value = F),
       shiny::uiOutput(outputId = ns("HetPups")),
       shiny::actionButton(ns("Submit"), label = "Add Litter")
@@ -58,7 +59,8 @@ pair_management <- function(id, data_sheet){
                                        "Male_pups"= as.integer(input$Males), 
                                        "Female_pups"= as.integer(input$Females), 
                                        "WT_pups"= as.integer(input$Wildtype), 
-                                       "KO_pups"= as.integer(input$Knockouts))
+                                       "KO_pups"= as.integer(input$Knockouts),
+                                       "NA_pups"=as.integer(input$NApups))
          }
          else{
            new_litter$data <- data.frame("Breeding_pair"= input$BreedingPair,
@@ -67,7 +69,8 @@ pair_management <- function(id, data_sheet){
                                          "Female_pups"= as.integer(input$Females), 
                                          "WT_pups"= as.integer(input$Wildtype), 
                                          "KO_pups"= as.integer(input$Knockouts),
-                                         "Het_pups"=as.integer(input$Heterozygotes))
+                                         "Het_pups"=as.integer(input$Heterozygotes),
+                                         "NA_pups"=as.integer(input$NApups))
          }
          
          if (length(new_litter$data) != length(data_sheet$data)){
@@ -98,6 +101,7 @@ pair_management <- function(id, data_sheet){
                                       "Female_pups"=0,
                                       "WT_pups"=0,
                                       "KO_pups"=0,
+                                      "NA_pups"=0,
                                       "Het_pups"=0)
            }
            else {
@@ -106,7 +110,8 @@ pair_management <- function(id, data_sheet){
                                       "Male_pups"=0,
                                       "Female_pups"=0,
                                       "WT_pups"=0,
-                                      "KO_pups"=0)
+                                      "KO_pups"=0,
+                                      "NA_pups"=0)
              }}
            else{
            if (isTRUE(input$HetButton)){
@@ -116,6 +121,7 @@ pair_management <- function(id, data_sheet){
                                       "Female_pups"=0,
                                       "WT_pups"=0,
                                       "KO_pups"=0,
+                                    "NA_pups"=0,
                                       "Het_pups"=0)
          }
          else {
@@ -124,7 +130,8 @@ pair_management <- function(id, data_sheet){
                                       "Male_pups"=0,
                                       "Female_pups"=0,
                                       "WT_pups"=0,
-                                      "KO_pups"=0)
+                                      "KO_pups"=0,
+                                    "NA_pups"=0)
            
          }
          if (length(SetupSheet) != length(data_sheet$data)){
