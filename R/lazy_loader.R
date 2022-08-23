@@ -64,7 +64,7 @@ pair_adder <- pair_inspection <- function(id, data_sheet, summary_sheet){
           tidyr::replace_na(list("F"=0, M = 0))
         
         test_sheet_joined <-
-          left_join(test_sheet_geno,
+          dplyr::left_join(test_sheet_geno,
                     test_sheet_sex,
                     by = "ID",
                     suffix = c("", ".y")) |> 
