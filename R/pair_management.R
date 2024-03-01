@@ -81,6 +81,10 @@ pair_management <- function(id, data_sheet){
          }
          else{
            data_sheet$data <- dplyr::bind_rows(data_sheet$data, new_litter$data)
+           shinyWidgets::sendSweetAlert(session,
+                                        title = "Success!",
+                                        type = "success",
+                                        text = "Your litter has been added")
          }
        })
        output$DatabaseDownload <- shiny::downloadHandler(

@@ -7,8 +7,7 @@
 # library(shiny)
 # library(tidyverse)
 
-data_sheet <- reactiveValues()
-summary_sheet <- reactiveValues()
+
 
 ui <- fluidPage(
 
@@ -25,6 +24,8 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) {
+  data_sheet <- reactiveValues()
+  summary_sheet <- reactiveValues()
   data_loading("Data_Loader", data_sheet)
   pair_inspection("Pair_inspection", data_sheet, summary_sheet)
   pair_management("Pair_management", data_sheet)

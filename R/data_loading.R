@@ -18,7 +18,10 @@ data_loading_ui <- function(id){
                 accept = c(".xlsx")),
       shiny::checkboxInput(inputId = ns("HetButton"), label = "Add heterozygotes to template?", value = F),
       shiny::downloadButton(outputId = ns("TemplateDownload"),
-                            label = "Download Template Sheet")
+                            label = "Download Template Sheet"),
+      shiny::h5("New to breedeR? try loading some test data with the button below"),
+      shiny::actionButton(inputId = ns("dummy"),
+                          label = "Load test data")
     ),
     mainPanel(
       plotOutput(outputId = ns("SummaryStats"),
@@ -93,12 +96,12 @@ data_loading <- function(id, data_sheet){
         },
         content = function(file){
           if (isTRUE(input$HetButton)){
-            templateSheet <- data.frame(matrix(ncol = 7, nrow = 1))  
-            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "Het_pups")
+            templateSheet <- data.frame(matrix(ncol = 8, nrow = 1))  
+            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "Het_pups", "NA_pups")
           }
           else {
-            templateSheet <- data.frame(matrix(ncol = 6, nrow = 1))  
-            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups")
+            templateSheet <- data.frame(matrix(ncol = 7, nrow = 1))  
+            colnames(templateSheet)<-c("Breeding_pair", "Litter_date", "Male_pups", "Female_pups", "WT_pups", "KO_pups", "NA_pups")
           }
           openxlsx::write.xlsx(templateSheet, file = file)
         }
@@ -174,6 +177,13 @@ data_loading <- function(id, data_sheet){
             )
           }
         }
+      })
+      
+      shiny::observeEvent(input$dummy,{
+        data_sheet$data <- readRDS(here::here("R/testdata.rds"))
+        shinyWidgets::sendSweetAlert(title = "test data loaded",
+                                     type = "success",
+                                     text = "test data has succesfully been loaded. You can now play around with the app!")
       })
       
       })
